@@ -110,11 +110,14 @@ class ManholeInterpreter(code.InteractiveInterpreter):
     def runcode(self, *a, **kw):
         orighook, sys.displayhook = sys.displayhook, self.displayhook
         try:
-            origout, sys.stdout = sys.stdout, FileWrapper(self.handler)
+            origout = sys.stdout
+            origerr = sys.stderr
+            sys.stdout = sys.stderr = FileWrapper(self.handler)
             try:
                 code.InteractiveInterpreter.runcode(self, *a, **kw)
             finally:
                 sys.stdout = origout
+                sys.stderr = origerr
         finally:
             sys.displayhook = orighook
 
